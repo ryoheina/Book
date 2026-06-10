@@ -1,0 +1,158 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build site",
+			"type": "shell",
+			"command": "npm install",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Install deps",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm install\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Build app",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run dev server",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run dev -- --host 0.0.0.0 --port 3000\"",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Verify build",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run app",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run dev -- --host 0.0.0.0 --port 3000\"",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Build final site",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run updated site",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run dev -- --host 0.0.0.0 --port 3000\"",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Build updated premium site",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Launch premium preview",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run dev -- --host 0.0.0.0 --port 3000\"",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Verify premium build",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Preview premium site",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run dev -- --host 0.0.0.0 --port 3003\"",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Verify cover update build",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Verify final cover update",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Verify six-book build",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Verify Railway setup build",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"npm.cmd run build\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Start Railway preview server",
+			"type": "shell",
+			"command": "powershell.exe -ExecutionPolicy Bypass -NoProfile -Command \"node server.js\"",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

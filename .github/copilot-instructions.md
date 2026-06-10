@@ -1,0 +1,3 @@
+- Verify the project builds with npm run build.
+- Keep the design responsive and premium.
+- Keep the book download flows intact.
