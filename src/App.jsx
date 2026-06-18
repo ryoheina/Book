@@ -218,7 +218,7 @@ export default function App() {
           <div className="section-heading">
             <div>
               <p className="eyebrow">Admin only</p>
-              <h3>Add or update Japanese learning books</h3>
+              <h3>Add or update Japanese and English learning books</h3>
             </div>
           </div>
 
