@@ -130,8 +130,8 @@ export default function App() {
     <div className="page-shell clean-layout">
       <header className="hero-panel glass-panel">
         <div className="hero-copy-wrap">
-          <p className="eyebrow">Japanese Book Download</p>
-          <h1>Luxury Japanese learning, designed for instant access.</h1>
+          <p className="eyebrow">Japanese And English Books Download</p>
+          <h1>Luxury Japanese And English learning, designed for instant access.</h1>
           <p className="lede">A cinematic digital library experience: premium visuals, effortless downloads, and a polished product feel from the first scroll.</p>
           <div className="hero-metrics">
             <div className="metric-card glass-inner"><strong>01</strong><span>Instant download</span></div>
@@ -151,7 +151,7 @@ export default function App() {
 
         <aside className="hero-side glass-inner">
           <p className="eyebrow">Collection</p>
-          <h3>Curated Japanese learning books</h3>
+          <h3>Curated Japanese and English learning books</h3>
           <p className="lede">Designed to feel premium, clean, and luxurious from the first impression.</p>
           <a className="button-link" href="#admin">Admin access</a>
         </aside>
@@ -163,7 +163,7 @@ export default function App() {
           <h2>Discover the collection with a refined search experience.</h2>
           <div className="search-shell glass-inner">
             <span>⌕</span>
-            <input type="text" placeholder="Search Japanese learning books" />
+            <input type="text" placeholder="Search Japanese and English learning books" />
           </div>
         </section>
 
