@@ -4,6 +4,16 @@ const ADMIN_PASSWORD = 'japanese2026';
 
 const initialBooks = [
  {
+    id: 1,
+    title: 'Japanese Learning Book 1',
+    description: 'An introduction to reading rhythm, and practical vocabulary for everyday Japanese.',
+    size: '20 MB',
+    language: 'Japanese / English',
+    category: 'Beginner',
+    cover: '/covers/japanese-1.svg',
+    file: '/books/Japanese1.rar'
+  },
+  {
     id: 2,
     title: 'Japanese Learning Book 2',
     description: 'Practice grammar, reading rhythm, and practical vocabulary for everyday Japanese.',
