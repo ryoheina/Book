@@ -3,17 +3,7 @@ import { useState } from 'react';
 const ADMIN_PASSWORD = 'japanese2026';
 
 const initialBooks = [
-  {
-    id: 1,
-    title: 'Japanese Learning Book 1',
-    description: 'A clean starter pack for beginners learning Japanese words, kana, and daily phrases.',
-    size: '18 MB',
-    language: 'Japanese / English',
-    category: 'Beginner',
-    cover: '/covers/japanese-1.svg',
-    file: '/books/Japanese1.rar'
-  },
-  {
+ {
     id: 2,
     title: 'Japanese Learning Book 2',
     description: 'Practice grammar, reading rhythm, and practical vocabulary for everyday Japanese.',
