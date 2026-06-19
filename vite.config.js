@@ -9,8 +9,11 @@ export default defineConfig({
       name: 'book-download-headers',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url?.startsWith('/books/') && req.url.endsWith('.rar')) {
-            res.setHeader('Content-Disposition', `attachment; filename="${path.basename(req.url.split('?')[0])}"`);
+          if (req.url?.startsWith('/books/') && req.url.includes('.rar')) {
+            const [pathname, search = ''] = req.url.split('?');
+            const params = new URLSearchParams(search);
+            const downloadName = params.get('filename') || path.basename(pathname);
+            res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
             res.setHeader('Cache-Control', 'no-cache');
           }
           next();

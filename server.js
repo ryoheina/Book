@@ -38,7 +38,8 @@ function resolvePath(requestPath) {
 }
 
 http.createServer((req, res) => {
-  const requestPath = req.url.split('?')[0];
+  const url = new URL(req.url, 'http://localhost');
+  const requestPath = url.pathname;
   const filePath = resolvePath(requestPath);
 
   if (!filePath) {
@@ -59,7 +60,8 @@ http.createServer((req, res) => {
     const headers = { 'Content-Type': contentType };
 
     if (ext === '.rar') {
-      headers['Content-Disposition'] = `attachment; filename="${path.basename(filePath)}"`;
+      const downloadName = url.searchParams.get('filename') || path.basename(filePath);
+      headers['Content-Disposition'] = `attachment; filename="${downloadName}"`;
       headers['Cache-Control'] = 'no-cache';
     }
 

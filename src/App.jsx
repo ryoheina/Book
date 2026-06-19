@@ -11,7 +11,7 @@ const initialBooks = [
     language: 'Japanese / English',
     category: 'Beginner',
     cover: '/covers/japanese-1.svg',
-    file: '/books/Japanese1.rar'
+    file: '/books/japanese-learning-book-1.rar'
   },
   {
     id: 2,
@@ -72,8 +72,9 @@ export default function App() {
 
   const triggerDownload = (book) => {
     const filename = `${book.title.replace(/\s+/g, '-').toLowerCase()}.rar`;
+    const url = `${book.file}?filename=${encodeURIComponent(filename)}`;
     const link = document.createElement('a');
-    link.href = book.file;
+    link.href = url;
     link.download = filename;
     link.rel = 'noopener';
     document.body.appendChild(link);
