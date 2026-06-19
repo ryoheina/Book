@@ -4,6 +4,7 @@ const http = require('http');
 
 const distDir = path.join(__dirname, 'dist');
 const port = Number(process.env.PORT || 4173);
+const assetPrefixes = ['books/', 'covers/', 'assets/'];
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
@@ -17,20 +18,34 @@ const mimeTypes = {
   '.gif': 'image/gif',
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
-  '.txt': 'text/plain; charset=utf-8'
+  '.txt': 'text/plain; charset=utf-8',
+  '.rar': 'application/vnd.rar'
 };
 
 function resolvePath(requestPath) {
   const safePath = decodeURIComponent(requestPath).replace(/^\/+/, '');
-  const basePath = path.join(distDir, safePath || 'index.html');
-  return fs.existsSync(basePath) && fs.statSync(basePath).isFile()
-    ? basePath
-    : path.join(distDir, 'index.html');
+  const filePath = path.join(distDir, safePath || 'index.html');
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    return filePath;
+  }
+
+  if (assetPrefixes.some((prefix) => safePath.startsWith(prefix))) {
+    return null;
+  }
+
+  return path.join(distDir, 'index.html');
 }
 
 http.createServer((req, res) => {
   const requestPath = req.url.split('?')[0];
   const filePath = resolvePath(requestPath);
+
+  if (!filePath) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('File not found');
+    return;
+  }
 
   fs.readFile(filePath, (error, content) => {
     if (error) {
@@ -41,8 +56,14 @@ http.createServer((req, res) => {
 
     const ext = path.extname(filePath).toLowerCase();
     const contentType = mimeTypes[ext] || 'application/octet-stream';
+    const headers = { 'Content-Type': contentType };
 
-    res.writeHead(200, { 'Content-Type': contentType });
+    if (ext === '.rar') {
+      headers['Content-Disposition'] = `attachment; filename="${path.basename(filePath)}"`;
+      headers['Cache-Control'] = 'no-cache';
+    }
+
+    res.writeHead(200, headers);
     res.end(content);
   });
 }).listen(port, '0.0.0.0', () => {

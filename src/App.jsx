@@ -71,12 +71,14 @@ export default function App() {
   const [adminOpen, setAdminOpen] = useState(false);
 
   const triggerDownload = (book) => {
+    const filename = `${book.title.replace(/\s+/g, '-').toLowerCase()}.rar`;
     const link = document.createElement('a');
     link.href = book.file;
-    link.download = book.title.replace(/\s+/g, '-').toLowerCase() + '.rar';
+    link.download = filename;
+    link.rel = 'noopener';
     document.body.appendChild(link);
     link.click();
-    link.remove();
+    document.body.removeChild(link);
   };
 
   const handleAdminLogin = (event) => {
@@ -138,13 +140,13 @@ export default function App() {
             <div className="metric-card glass-inner"><strong>02</strong><span>No sign-up</span></div>
             <div className="metric-card glass-inner"><strong>03</strong><span>Japanese-first collection</span></div>
           </div>
-          <button className="download-button hero-button" onClick={() => triggerDownload(books[0])}>Download</button>
+          <button type="button" className="download-button hero-button" onClick={() => triggerDownload(books[0])}>Download</button>
         </div>
 
         <div className="hero-visual-wrap">
           <div className="spotlight" />
           <div className="platform-ring" />
-          <button className="floating-cover" onClick={() => triggerDownload(books[0])} aria-label={`Download ${books[0].title}`}>
+          <button type="button" className="floating-cover" onClick={() => triggerDownload(books[0])} aria-label={`Download ${books[0].title}`}>
             <img src={books[0].cover} alt={`${books[0].title} cover`} />
           </button>
         </div>
@@ -177,14 +179,14 @@ export default function App() {
           <div className="carousel-row">
             {books.map((book) => (
               <article className="luxury-card glass-inner" key={book.id}>
-                <button className="cover-thumb" onClick={() => triggerDownload(book)} aria-label={`Download ${book.title}`}>
+                <button type="button" className="cover-thumb" onClick={() => triggerDownload(book)} aria-label={`Download ${book.title}`}>
                   <img src={book.cover} alt={`${book.title} cover`} loading="lazy" />
                 </button>
                 <div className="luxury-card-body">
                   <p className="eyebrow">{book.category}</p>
                   <h4>{book.title}</h4>
                   <p>{book.description}</p>
-                  <button className="download-button" onClick={() => triggerDownload(book)}>Download</button>
+                  <button type="button" className="download-button" onClick={() => triggerDownload(book)}>Download</button>
                 </div>
               </article>
             ))}
