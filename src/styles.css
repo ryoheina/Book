@@ -15,7 +15,7 @@
   --shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
   --radius: 18px;
   --radius-sm: 12px;
-  --font-body: 'Sora', 'Segoe UI', sans-serif;
+  --font-body: 'Sora', 'Noto Sans JP', 'Segoe UI', sans-serif;
   --font-display: 'Noto Serif', 'Georgia', serif;
 }
 
@@ -106,8 +106,90 @@ a { color: inherit; text-decoration: none; }
 
 .topnav {
   display: flex;
+  align-items: center;
   gap: 20px;
   font-size: 0.92rem;
+}
+
+.lang-toggle {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.lang-toggle:hover {
+  border-color: rgba(232, 93, 76, 0.45);
+  background: var(--surface-hover);
+}
+
+.library-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.library-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.library-tab-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+}
+
+.library-tab:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.library-tab.active {
+  background: var(--accent-soft);
+  border-color: rgba(232, 93, 76, 0.4);
+  color: #ffd5cf;
+}
+
+.library-tab.active .library-tab-icon {
+  background: rgba(232, 93, 76, 0.25);
+}
+
+.book-card[data-lang='ja'] .book-tag { color: #f0b880; }
+.book-card[data-lang='en'] .book-tag { color: #7ec8f0; }
+
+.admin-form select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.admin-form-wide select {
+  grid-column: 1 / -1;
 }
 
 .topnav a {

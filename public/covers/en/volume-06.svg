@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 640">
+  <defs>
+    <linearGradient id="en6" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a2030"/>
+      <stop offset="1" stop-color="#7a3548"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="640" rx="20" fill="url(#en6)"/>
+  <rect x="28" y="28" width="424" height="584" rx="14" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <text x="240" y="130" fill="#f08070" font-family="Georgia, serif" font-size="80" font-weight="700" text-anchor="middle">F</text>
+  <text x="240" y="205" fill="rgba(255,255,255,0.5)" font-family="sans-serif" font-size="16" letter-spacing="8" text-anchor="middle">VOLUME 06</text>
+  <text x="240" y="310" fill="#f4f1ea" font-family="Georgia, serif" font-size="34" font-weight="600" text-anchor="middle">Advanced</text>
+  <text x="240" y="355" fill="#f4f1ea" font-family="Georgia, serif" font-size="34" font-weight="600" text-anchor="middle">Grammar</text>
+  <line x1="140" y1="400" x2="340" y2="400" stroke="rgba(240,128,112,0.6)" stroke-width="2"/>
+  <text x="240" y="450" fill="rgba(255,255,255,0.55)" font-family="sans-serif" font-size="15" text-anchor="middle">Writing / Fluency</text>
+</svg>

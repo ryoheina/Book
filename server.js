@@ -22,6 +22,14 @@ const mimeTypes = {
   '.rar': 'application/vnd.rar'
 };
 
+function contentDisposition(filename) {
+  const asciiFallback = filename.replace(/[^\x20-\x7E]/g, '_').replace(/["\\]/g, '_') || 'download.rar';
+  const encoded = encodeURIComponent(filename)
+    .replace(/['()]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`)
+    .replace(/\*/g, '%2A');
+  return `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encoded}`;
+}
+
 function resolvePath(requestPath) {
   const safePath = decodeURIComponent(requestPath).replace(/^\/+/, '');
   const filePath = path.join(distDir, safePath || 'index.html');
@@ -61,7 +69,7 @@ http.createServer((req, res) => {
 
     if (ext === '.rar') {
       const downloadName = url.searchParams.get('filename') || path.basename(filePath);
-      headers['Content-Disposition'] = `attachment; filename="${downloadName}"`;
+      headers['Content-Disposition'] = contentDisposition(downloadName);
       headers['Cache-Control'] = 'no-cache';
     }
 

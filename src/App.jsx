@@ -1,94 +1,43 @@
 import { useMemo, useState } from 'react';
+import { initialBooks, getBookText, getDownloadName } from './data/books';
+import { ui, categoryKeys, getCategoryLabel } from './i18n/ui';
 
 const ADMIN_PASSWORD = 'japanese2026';
 
-const initialBooks = [
-  {
-    id: 1,
-    title: 'Japanese Learning Book 1',
-    description: 'A clean starter pack for beginners — kana, core vocabulary, and everyday phrases.',
-    size: '20 MB',
-    language: 'Japanese / English',
-    category: 'Beginner',
-    cover: '/covers/japanese-1.svg',
-    file: '/books/japanese-learning-book-1.rar'
-  },
-  {
-    id: 2,
-    title: 'Japanese Learning Book 2',
-    description: 'Grammar foundations, reading rhythm, and practical vocabulary for daily life.',
-    size: '22 MB',
-    language: 'Japanese / English',
-    category: 'Beginner',
-    cover: '/covers/japanese-2.svg',
-    file: '/books/Japanese2.rar'
-  },
-  {
-    id: 3,
-    title: 'Japanese Learning Book 3',
-    description: 'Focused lessons on hiragana, katakana, and simple sentence patterns.',
-    size: '24 MB',
-    language: 'Japanese / English',
-    category: 'Beginner',
-    cover: '/covers/japanese-3.svg',
-    file: '/books/Japanese3.rar'
-  },
-  {
-    id: 4,
-    title: 'Japanese Learning Book 4',
-    description: 'Useful phrases, listening cues, and cultural context for real conversations.',
-    size: '19 MB',
-    language: 'Japanese / English',
-    category: 'Beginner',
-    cover: '/covers/japanese-4.svg',
-    file: '/books/Japanese4.rar'
-  },
-  {
-    id: 5,
-    title: 'Japanese Learning Book 5',
-    description: 'Expanded reading practice and structured study for steady progress.',
-    size: '27 MB',
-    language: 'Japanese / English',
-    category: 'Beginner',
-    cover: '/covers/japanese-5.svg',
-    file: '/books/Japanese5.rar'
-  },
-  {
-    id: 6,
-    title: 'Japanese Learning Book 6',
-    description: 'Sentence structure, fluency drills, and confident study habits.',
-    size: '26 MB',
-    language: 'Japanese / English',
-    category: 'Grammar',
-    cover: '/covers/japanese-6.svg',
-    file: '/books/Japanese6.rar'
-  }
-];
-
-const categories = ['All', 'Beginner', 'Grammar'];
-
 export default function App() {
   const [books, setBooks] = useState(initialBooks);
+  const [uiLocale, setUiLocale] = useState('en');
+  const [activeLibrary, setActiveLibrary] = useState('ja');
   const [adminKey, setAdminKey] = useState('');
   const [adminOpen, setAdminOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState('all');
+
+  const t = ui[uiLocale];
+
+  const libraryBooks = useMemo(
+    () => books.filter((book) => book.lang === activeLibrary),
+    [books, activeLibrary]
+  );
 
   const filteredBooks = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    return books.filter((book) => {
-      const matchesCategory = activeCategory === 'All' || book.category === activeCategory;
+    return libraryBooks.filter((book) => {
+      const text = getBookText(book);
+      const matchesCategory = activeCategory === 'all' || book.category === activeCategory;
       const matchesQuery =
         !normalized ||
-        book.title.toLowerCase().includes(normalized) ||
-        book.description.toLowerCase().includes(normalized) ||
-        book.category.toLowerCase().includes(normalized);
+        text.title.toLowerCase().includes(normalized) ||
+        text.description.toLowerCase().includes(normalized) ||
+        getCategoryLabel(book.category, uiLocale).toLowerCase().includes(normalized);
       return matchesCategory && matchesQuery;
     });
-  }, [books, query, activeCategory]);
+  }, [libraryBooks, query, activeCategory, uiLocale]);
+
+  const featuredBook = libraryBooks[0];
 
   const triggerDownload = (book) => {
-    const filename = `${book.title.replace(/\s+/g, '-').toLowerCase()}.rar`;
+    const filename = getDownloadName(book);
     const url = `${book.file}?filename=${encodeURIComponent(filename)}`;
     const link = document.createElement('a');
     link.href = url;
@@ -99,13 +48,19 @@ export default function App() {
     document.body.removeChild(link);
   };
 
+  const switchLibrary = (library) => {
+    setActiveLibrary(library);
+    setActiveCategory('all');
+    setQuery('');
+  };
+
   const handleAdminLogin = (event) => {
     event.preventDefault();
     if (adminKey === ADMIN_PASSWORD) {
       setAdminOpen(true);
       setAdminKey('');
     } else {
-      alert('Wrong password.');
+      alert(t.adminWrongPassword);
     }
   };
 
@@ -114,52 +69,64 @@ export default function App() {
     const form = new FormData(event.currentTarget);
     const title = form.get('title')?.toString().trim();
     const description = form.get('description')?.toString().trim();
-    const category = form.get('category')?.toString().trim() || 'Beginner';
-    const language = form.get('language')?.toString().trim() || 'Japanese / English';
+    const category = form.get('category')?.toString().trim() || 'beginner';
+    const lang = form.get('lang')?.toString().trim() === 'en' ? 'en' : 'ja';
     const size = form.get('size')?.toString().trim() || '—';
     const coverFile = form.get('cover');
     const rarFile = form.get('file');
 
     if (!title || !description || !coverFile || !rarFile) {
-      alert('Please fill all fields and upload both files.');
+      alert(t.adminFillFields);
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
+      const id = `${lang}-${Date.now()}`;
       setBooks((prev) => [
         {
-          id: Date.now(),
-          title,
-          description,
-          size,
-          language,
+          id,
+          lang,
           category,
+          size,
           cover: reader.result,
-          file: URL.createObjectURL(rarFile)
+          file: URL.createObjectURL(rarFile),
+          text: {
+            [lang]: { title, description },
+            [lang === 'ja' ? 'en' : 'ja']: { title, description }
+          }
         },
         ...prev
       ]);
       event.currentTarget.reset();
-      alert('Book added.');
+      alert(t.adminAdded);
     };
     reader.readAsDataURL(coverFile);
   };
 
+  const featuredText = featuredBook ? getBookText(featuredBook) : null;
+
   return (
-    <div className="site">
+    <div className="site" lang={uiLocale}>
       <header className="topbar">
         <div className="topbar-inner">
           <a className="brand" href="#">
-            <span className="brand-mark">書</span>
+            <span className="brand-mark">{activeLibrary === 'ja' ? '書' : 'A'}</span>
             <span className="brand-text">
-              <strong>BookVault</strong>
-              <small>Japanese & English library</small>
+              <strong>{t.brandName}</strong>
+              <small>{t.brandTagline}</small>
             </span>
           </a>
           <nav className="topnav">
-            <a href="#collection">Books</a>
-            <a href="#admin">Admin</a>
+            <a href="#collection">{t.navBooks}</a>
+            <a href="#admin">{t.navAdmin}</a>
+            <button
+              type="button"
+              className="lang-toggle"
+              onClick={() => setUiLocale((prev) => (prev === 'en' ? 'ja' : 'en'))}
+            >
+              {t.langToggle}
+            </button>
           </nav>
         </div>
       </header>
@@ -167,29 +134,31 @@ export default function App() {
       <section className="hero">
         <div className="hero-inner">
           <div className="hero-copy">
-            <p className="kicker">Free study materials</p>
-            <h1>Learn Japanese with books you can download instantly.</h1>
+            <p className="kicker">{t.heroKicker}</p>
+            <h1>{activeLibrary === 'ja' ? t.heroTitleJa : t.heroTitleEn}</h1>
             <p className="hero-lede">
-              Six curated volumes for beginners and grammar practice. No sign-up — click a cover and start studying.
+              {activeLibrary === 'ja' ? t.heroLedeJa : t.heroLedeEn}
             </p>
             <div className="hero-stats">
-              <div><strong>{books.length}</strong><span>Books</span></div>
-              <div><strong>0</strong><span>Sign-up required</span></div>
-              <div><strong>RAR</strong><span>Direct download</span></div>
+              <div><strong>{libraryBooks.length}</strong><span>{t.statBooks}</span></div>
+              <div><strong>0</strong><span>{t.statSignup}</span></div>
+              <div><strong>RAR</strong><span>{t.statFormat}</span></div>
             </div>
           </div>
-          <button
-            type="button"
-            className="hero-featured"
-            onClick={() => triggerDownload(books[0])}
-            aria-label={`Download ${books[0].title}`}
-          >
-            <img src={books[0].cover} alt={`${books[0].title} cover`} />
-            <div className="hero-featured-label">
-              <span>Featured</span>
-              <strong>{books[0].title}</strong>
-            </div>
-          </button>
+          {featuredBook && (
+            <button
+              type="button"
+              className="hero-featured"
+              onClick={() => triggerDownload(featuredBook)}
+              aria-label={t.downloadAria(featuredText.title)}
+            >
+              <img src={featuredBook.cover} alt="" />
+              <div className="hero-featured-label">
+                <span>{t.featured}</span>
+                <strong>{featuredText.title}</strong>
+              </div>
+            </button>
+          )}
         </div>
       </section>
 
@@ -197,12 +166,35 @@ export default function App() {
         <section id="collection" className="collection">
           <div className="collection-head">
             <div>
-              <p className="kicker">Collection</p>
-              <h2>Pick a volume</h2>
+              <p className="kicker">{t.collectionKicker}</p>
+              <h2>{t.collectionTitle}</h2>
             </div>
             <p className="result-count">
-              {filteredBooks.length} of {books.length} books
+              {t.resultCount(filteredBooks.length, libraryBooks.length)}
             </p>
+          </div>
+
+          <div className="library-switch" role="tablist" aria-label="Book library">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLibrary === 'ja'}
+              className={activeLibrary === 'ja' ? 'library-tab active' : 'library-tab'}
+              onClick={() => switchLibrary('ja')}
+            >
+              <span className="library-tab-icon">書</span>
+              {t.sectionJapanese}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLibrary === 'en'}
+              className={activeLibrary === 'en' ? 'library-tab active' : 'library-tab'}
+              onClick={() => switchLibrary('en')}
+            >
+              <span className="library-tab-icon">A</span>
+              {t.sectionEnglish}
+            </button>
           </div>
 
           <div className="toolbar">
@@ -212,11 +204,11 @@ export default function App() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by title, topic, or level…"
+                placeholder={t.searchPlaceholder}
               />
             </label>
             <div className="filter-row" role="tablist" aria-label="Filter by category">
-              {categories.map((category) => (
+              {categoryKeys.map((category) => (
                 <button
                   key={category}
                   type="button"
@@ -225,7 +217,7 @@ export default function App() {
                   className={activeCategory === category ? 'filter-chip active' : 'filter-chip'}
                   onClick={() => setActiveCategory(category)}
                 >
-                  {category}
+                  {getCategoryLabel(category, uiLocale)}
                 </button>
               ))}
             </div>
@@ -233,65 +225,72 @@ export default function App() {
 
           {filteredBooks.length > 0 ? (
             <div className="book-grid">
-              {filteredBooks.map((book) => (
-                <article className="book-card" key={book.id}>
-                  <button
-                    type="button"
-                    className="book-cover-btn"
-                    onClick={() => triggerDownload(book)}
-                    aria-label={`Download ${book.title}`}
-                  >
-                    <img src={book.cover} alt="" loading="lazy" />
-                  </button>
-                  <div className="book-body">
-                    <div className="book-meta-row">
-                      <span className="book-tag">{book.category}</span>
-                      <span className="book-size">{book.size}</span>
-                    </div>
-                    <h3>{book.title}</h3>
-                    <p>{book.description}</p>
-                    <p className="book-lang">{book.language}</p>
-                    <button type="button" className="btn-download" onClick={() => triggerDownload(book)}>
-                      Download
+              {filteredBooks.map((book) => {
+                const text = getBookText(book);
+                return (
+                  <article className="book-card" key={book.id} data-lang={book.lang}>
+                    <button
+                      type="button"
+                      className="book-cover-btn"
+                      onClick={() => triggerDownload(book)}
+                      aria-label={t.downloadAria(text.title)}
+                    >
+                      <img src={book.cover} alt="" loading="lazy" />
                     </button>
-                  </div>
-                </article>
-              ))}
+                    <div className="book-body">
+                      <div className="book-meta-row">
+                        <span className="book-tag">{getCategoryLabel(book.category, book.lang)}</span>
+                        <span className="book-size">{book.size}</span>
+                      </div>
+                      <h3>{text.title}</h3>
+                      <p>{text.description}</p>
+                      <p className="book-lang">
+                        {book.lang === 'ja' ? '日本語' : 'English'}
+                      </p>
+                      <button type="button" className="btn-download" onClick={() => triggerDownload(book)}>
+                        {t.download}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <div className="empty-state">
-              <p>No books match your search.</p>
+              <p>{t.emptyState}</p>
               <button
                 type="button"
                 className="btn-ghost"
                 onClick={() => {
                   setQuery('');
-                  setActiveCategory('All');
+                  setActiveCategory('all');
                 }}
               >
-                Clear filters
+                {t.clearFilters}
               </button>
             </div>
           )}
         </section>
 
         <section className="highlights">
-          {[
-            ['Instant access', 'Downloads start the moment you click.'],
-            ['Beginner friendly', 'Volumes 1–5 build core skills step by step.'],
-            ['Grammar focus', 'Book 6 deepens sentence structure and fluency.']
-          ].map(([title, text]) => (
-            <article key={title}>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
-          ))}
+          <article>
+            <h3>{t.highlight1Title}</h3>
+            <p>{t.highlight1Text}</p>
+          </article>
+          <article>
+            <h3>{activeLibrary === 'ja' ? t.highlight2TitleJa : t.highlight2TitleEn}</h3>
+            <p>{activeLibrary === 'ja' ? t.highlight2TextJa : t.highlight2TextEn}</p>
+          </article>
+          <article>
+            <h3>{t.highlight3Title}</h3>
+            <p>{activeLibrary === 'ja' ? t.highlight3TextJa : t.highlight3TextEn}</p>
+          </article>
         </section>
 
         <section id="admin" className="admin">
           <div className="admin-head">
-            <p className="kicker">Admin</p>
-            <h2>Add a new book</h2>
+            <p className="kicker">{t.adminKicker}</p>
+            <h2>{t.adminTitle}</h2>
           </div>
           {!adminOpen ? (
             <form onSubmit={handleAdminLogin} className="admin-form">
@@ -299,28 +298,31 @@ export default function App() {
                 type="password"
                 value={adminKey}
                 onChange={(e) => setAdminKey(e.target.value)}
-                placeholder="Enter admin password"
+                placeholder={t.adminPassword}
                 required
               />
-              <button className="btn-download" type="submit">Unlock</button>
+              <button className="btn-download" type="submit">{t.adminUnlock}</button>
             </form>
           ) : (
             <form onSubmit={handleAddBook} className="admin-form admin-form-wide">
-              <input name="title" placeholder="Book title" required />
-              <input name="description" placeholder="Short description" required />
-              <input name="category" placeholder="Category" defaultValue="Beginner" />
-              <input name="language" placeholder="Language" defaultValue="Japanese / English" />
-              <input name="size" placeholder="File size" defaultValue="20 MB" />
-              <label>Cover image<input type="file" name="cover" accept="image/*" required /></label>
-              <label>RAR file<input type="file" name="file" accept=".rar" required /></label>
-              <button className="btn-download" type="submit">Add book</button>
+              <select name="lang" defaultValue={activeLibrary}>
+                <option value="ja">日本語 / Japanese</option>
+                <option value="en">英語 / English</option>
+              </select>
+              <input name="title" placeholder={t.adminBookTitle} required />
+              <input name="description" placeholder={t.adminDescription} required />
+              <input name="category" placeholder={t.adminCategory} defaultValue="beginner" />
+              <input name="size" placeholder={t.adminSize} defaultValue="20 MB" />
+              <label>{t.adminCover}<input type="file" name="cover" accept="image/*" required /></label>
+              <label>{t.adminFile}<input type="file" name="file" accept=".rar" required /></label>
+              <button className="btn-download" type="submit">{t.adminAdd}</button>
             </form>
           )}
         </section>
       </main>
 
       <footer className="footer">
-        <p>BookVault — Japanese & English learning books, free to download.</p>
+        <p>{t.footer}</p>
       </footer>
     </div>
   );
