@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 const ADMIN_PASSWORD = 'japanese2026';
 
 const initialBooks = [
- {
+  {
     id: 1,
     title: 'Japanese Learning Book 1',
-    description: 'An introduction to reading rhythm, and practical vocabulary for everyday Japanese.',
+    description: 'A clean starter pack for beginners — kana, core vocabulary, and everyday phrases.',
     size: '20 MB',
     language: 'Japanese / English',
     category: 'Beginner',
@@ -16,7 +16,7 @@ const initialBooks = [
   {
     id: 2,
     title: 'Japanese Learning Book 2',
-    description: 'Practice grammar, reading rhythm, and practical vocabulary for everyday Japanese.',
+    description: 'Grammar foundations, reading rhythm, and practical vocabulary for daily life.',
     size: '22 MB',
     language: 'Japanese / English',
     category: 'Beginner',
@@ -26,7 +26,7 @@ const initialBooks = [
   {
     id: 3,
     title: 'Japanese Learning Book 3',
-    description: 'A focused set of lessons for hiragana, katakana, and simple sentence patterns.',
+    description: 'Focused lessons on hiragana, katakana, and simple sentence patterns.',
     size: '24 MB',
     language: 'Japanese / English',
     category: 'Beginner',
@@ -36,7 +36,7 @@ const initialBooks = [
   {
     id: 4,
     title: 'Japanese Learning Book 4',
-    description: 'Build confidence with useful phrases, listening cues, and cultural context.',
+    description: 'Useful phrases, listening cues, and cultural context for real conversations.',
     size: '19 MB',
     language: 'Japanese / English',
     category: 'Beginner',
@@ -46,7 +46,7 @@ const initialBooks = [
   {
     id: 5,
     title: 'Japanese Learning Book 5',
-    description: 'An expanded lesson collection for reading practice and structured Japanese study.',
+    description: 'Expanded reading practice and structured study for steady progress.',
     size: '27 MB',
     language: 'Japanese / English',
     category: 'Beginner',
@@ -56,7 +56,7 @@ const initialBooks = [
   {
     id: 6,
     title: 'Japanese Learning Book 6',
-    description: 'A polished final layer for sentence structure, fluency, and confident study habits.',
+    description: 'Sentence structure, fluency drills, and confident study habits.',
     size: '26 MB',
     language: 'Japanese / English',
     category: 'Grammar',
@@ -65,10 +65,27 @@ const initialBooks = [
   }
 ];
 
+const categories = ['All', 'Beginner', 'Grammar'];
+
 export default function App() {
   const [books, setBooks] = useState(initialBooks);
   const [adminKey, setAdminKey] = useState('');
   const [adminOpen, setAdminOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  const filteredBooks = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return books.filter((book) => {
+      const matchesCategory = activeCategory === 'All' || book.category === activeCategory;
+      const matchesQuery =
+        !normalized ||
+        book.title.toLowerCase().includes(normalized) ||
+        book.description.toLowerCase().includes(normalized) ||
+        book.category.toLowerCase().includes(normalized);
+      return matchesCategory && matchesQuery;
+    });
+  }, [books, query, activeCategory]);
 
   const triggerDownload = (book) => {
     const filename = `${book.title.replace(/\s+/g, '-').toLowerCase()}.rar`;
@@ -130,130 +147,181 @@ export default function App() {
   };
 
   return (
-    <div className="page-shell clean-layout">
-      <header className="hero-panel glass-panel">
-        <div className="hero-copy-wrap">
-          <p className="eyebrow">Japanese And English Books Download</p>
-          <h1>Luxury Japanese And English learning, designed for instant access.</h1>
-          <p className="lede">A cinematic digital library experience: premium visuals, effortless downloads, and a polished product feel from the first scroll.</p>
-          <div className="hero-metrics">
-            <div className="metric-card glass-inner"><strong>01</strong><span>Instant download</span></div>
-            <div className="metric-card glass-inner"><strong>02</strong><span>No sign-up</span></div>
-            <div className="metric-card glass-inner"><strong>03</strong><span>Japanese-first collection</span></div>
-          </div>
-          <button type="button" className="download-button hero-button" onClick={() => triggerDownload(books[0])}>Download</button>
+    <div className="site">
+      <header className="topbar">
+        <div className="topbar-inner">
+          <a className="brand" href="#">
+            <span className="brand-mark">書</span>
+            <span className="brand-text">
+              <strong>BookVault</strong>
+              <small>Japanese & English library</small>
+            </span>
+          </a>
+          <nav className="topnav">
+            <a href="#collection">Books</a>
+            <a href="#admin">Admin</a>
+          </nav>
         </div>
-
-        <div className="hero-visual-wrap">
-          <div className="spotlight" />
-          <div className="platform-ring" />
-          <button type="button" className="floating-cover" onClick={() => triggerDownload(books[0])} aria-label={`Download ${books[0].title}`}>
-            <img src={books[0].cover} alt={`${books[0].title} cover`} />
-          </button>
-        </div>
-
-        <aside className="hero-side glass-inner">
-          <p className="eyebrow">Collection</p>
-          <h3>Curated Japanese and English learning books</h3>
-          <p className="lede">Designed to feel premium, clean, and luxurious from the first impression.</p>
-          <a className="button-link" href="#admin">Admin access</a>
-        </aside>
       </header>
 
-      <main className="stack">
-        <section className="glass-panel search-panel">
-          <p className="eyebrow">Search</p>
-          <h2>Discover the collection with a refined search experience.</h2>
-          <div className="search-shell glass-inner">
-            <span>⌕</span>
-            <input type="text" placeholder="Search Japanese and English learning books" />
-          </div>
-        </section>
-
-        <section className="glass-panel collection-panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Featured collection</p>
-              <h3>Luxury book showcase</h3>
+      <section className="hero">
+        <div className="hero-inner">
+          <div className="hero-copy">
+            <p className="kicker">Free study materials</p>
+            <h1>Learn Japanese with books you can download instantly.</h1>
+            <p className="hero-lede">
+              Six curated volumes for beginners and grammar practice. No sign-up — click a cover and start studying.
+            </p>
+            <div className="hero-stats">
+              <div><strong>{books.length}</strong><span>Books</span></div>
+              <div><strong>0</strong><span>Sign-up required</span></div>
+              <div><strong>RAR</strong><span>Direct download</span></div>
             </div>
           </div>
-          <div className="carousel-row">
-            {books.map((book) => (
-              <article className="luxury-card glass-inner" key={book.id}>
-                <button type="button" className="cover-thumb" onClick={() => triggerDownload(book)} aria-label={`Download ${book.title}`}>
-                  <img src={book.cover} alt={`${book.title} cover`} loading="lazy" />
+          <button
+            type="button"
+            className="hero-featured"
+            onClick={() => triggerDownload(books[0])}
+            aria-label={`Download ${books[0].title}`}
+          >
+            <img src={books[0].cover} alt={`${books[0].title} cover`} />
+            <div className="hero-featured-label">
+              <span>Featured</span>
+              <strong>{books[0].title}</strong>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <main className="main">
+        <section id="collection" className="collection">
+          <div className="collection-head">
+            <div>
+              <p className="kicker">Collection</p>
+              <h2>Pick a volume</h2>
+            </div>
+            <p className="result-count">
+              {filteredBooks.length} of {books.length} books
+            </p>
+          </div>
+
+          <div className="toolbar">
+            <label className="search-field">
+              <span className="search-icon" aria-hidden>⌕</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by title, topic, or level…"
+              />
+            </label>
+            <div className="filter-row" role="tablist" aria-label="Filter by category">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeCategory === category}
+                  className={activeCategory === category ? 'filter-chip active' : 'filter-chip'}
+                  onClick={() => setActiveCategory(category)}
+                >
+                  {category}
                 </button>
-                <div className="luxury-card-body">
-                  <p className="eyebrow">{book.category}</p>
-                  <h4>{book.title}</h4>
-                  <p>{book.description}</p>
-                  <button type="button" className="download-button" onClick={() => triggerDownload(book)}>Download</button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="glass-panel categories-panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Categories</p>
-              <h3>Curated by learning path</h3>
-            </div>
-          </div>
-          <div className="category-grid">
-            {['Beginner', 'Grammar', 'Kana', 'JLPT', 'Reading', 'Culture'].map((item) => (
-              <article className="category-card glass-inner" key={item}><h4>{item}</h4><p>Luxury learning pathways designed for focused study.</p></article>
-            ))}
-          </div>
-        </section>
-
-        <section className="glass-panel trust-panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Trust</p>
-              <h3>Why visitors trust the experience</h3>
-            </div>
-          </div>
-          <div className="trust-grid">
-            {[
-              ['Instant Download', 'Download begins immediately with a single click.'],
-              ['No Registration', 'No account setup or login required.'],
-              ['Fast Access', 'Lightweight files and a clean interface.'],
-              ['Secure Files', 'Direct file delivery with a premium feel.']
-            ].map(([title, text]) => (
-              <article className="trust-card glass-inner" key={title}><h4>{title}</h4><p>{text}</p></article>
-            ))}
-          </div>
-        </section>
-
-        <section id="admin" className="glass-panel admin-card">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Admin only</p>
-              <h3>Add or update Japanese and English learning books</h3>
+              ))}
             </div>
           </div>
 
+          {filteredBooks.length > 0 ? (
+            <div className="book-grid">
+              {filteredBooks.map((book) => (
+                <article className="book-card" key={book.id}>
+                  <button
+                    type="button"
+                    className="book-cover-btn"
+                    onClick={() => triggerDownload(book)}
+                    aria-label={`Download ${book.title}`}
+                  >
+                    <img src={book.cover} alt="" loading="lazy" />
+                  </button>
+                  <div className="book-body">
+                    <div className="book-meta-row">
+                      <span className="book-tag">{book.category}</span>
+                      <span className="book-size">{book.size}</span>
+                    </div>
+                    <h3>{book.title}</h3>
+                    <p>{book.description}</p>
+                    <p className="book-lang">{book.language}</p>
+                    <button type="button" className="btn-download" onClick={() => triggerDownload(book)}>
+                      Download
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <p>No books match your search.</p>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => {
+                  setQuery('');
+                  setActiveCategory('All');
+                }}
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+        </section>
+
+        <section className="highlights">
+          {[
+            ['Instant access', 'Downloads start the moment you click.'],
+            ['Beginner friendly', 'Volumes 1–5 build core skills step by step.'],
+            ['Grammar focus', 'Book 6 deepens sentence structure and fluency.']
+          ].map(([title, text]) => (
+            <article key={title}>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </section>
+
+        <section id="admin" className="admin">
+          <div className="admin-head">
+            <p className="kicker">Admin</p>
+            <h2>Add a new book</h2>
+          </div>
           {!adminOpen ? (
             <form onSubmit={handleAdminLogin} className="admin-form">
-              <input type="password" value={adminKey} onChange={(e) => setAdminKey(e.target.value)} placeholder="Enter admin password" required />
-              <button className="download-button" type="submit">Unlock admin panel</button>
+              <input
+                type="password"
+                value={adminKey}
+                onChange={(e) => setAdminKey(e.target.value)}
+                placeholder="Enter admin password"
+                required
+              />
+              <button className="btn-download" type="submit">Unlock</button>
             </form>
           ) : (
-            <form onSubmit={handleAddBook} className="admin-form">
+            <form onSubmit={handleAddBook} className="admin-form admin-form-wide">
               <input name="title" placeholder="Book title" required />
               <input name="description" placeholder="Short description" required />
               <input name="category" placeholder="Category" defaultValue="Beginner" />
               <input name="language" placeholder="Language" defaultValue="Japanese / English" />
-              <input name="size" placeholder="File size" defaultValue="18 MB" />
+              <input name="size" placeholder="File size" defaultValue="20 MB" />
               <label>Cover image<input type="file" name="cover" accept="image/*" required /></label>
               <label>RAR file<input type="file" name="file" accept=".rar" required /></label>
-              <button className="download-button" type="submit">Add book</button>
+              <button className="btn-download" type="submit">Add book</button>
             </form>
           )}
         </section>
       </main>
+
+      <footer className="footer">
+        <p>BookVault — Japanese & English learning books, free to download.</p>
+      </footer>
     </div>
   );
 }
